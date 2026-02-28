@@ -1,111 +1,217 @@
-# SalesLedger
+﻿# SalesLedger — Sales Module
 
-`SalesLedger` is a .NET Framework 4.8 solution with:
-- `SalesLedger` (Web project)
-- `SalesLedger.Business` (Business layer)
-- `SalesLedger.DataAccess` (EF6 data access)
+A small ERP-style Sales module built with ASP.NET Web Forms (.NET Framework 4.8) and Entity Framework 6.  
+Manages Sales Orders, Invoices, Payments, Inventory, and General Ledger (GL) Transactions.
 
-## Prerequisites
+---
 
-- Visual Studio 2022 (with `.NET Framework 4.8` workload)
-- SQL Server (Database Engine) installed locally or reachable on network
-- SQL login available (or use Windows Authentication by changing the connection string)
-- NuGet package restore enabled
+## Quick Start
 
-## Clone and open
+### Prerequisites
 
-1. Clone repository.
-2. Open solution in Visual Studio.
-3. Restore NuGet packages (automatic on build, or via NuGet restore).
+| Tool | Version |
+|------|---------|
+| Visual Studio | 2022 (or later) with .NET Framework 4.8 workload |
+| SQL Server | 2019+ (LocalDB, Express, or Developer) |
 
-## Database configuration (important)
+### Run the Project
 
-Before first run, update connection string `SalesLedgerDb` in both files:
-- `SalesLedger/Web.config`
-- `SalesLedger.DataAccess/App.config`
+1. **Clone** the repository
+2. **Open** `SalesLedger/SalesLedger.sln` in Visual Studio
+3. **Update the connection string** in `SalesLedger/Web.config` if your SQL Server instance is not `(local)`:
+   ```xml
+   <add name="SalesLedgerDb"
+        connectionString="Data Source=(local);Initial Catalog=SalesLedgerDb;Integrated Security=True;MultipleActiveResultSets=True;TrustServerCertificate=True"
+        providerName="System.Data.SqlClient" />
+   ```
+   Replace `(local)` with your server name (e.g., `.\SQLEXPRESS`, `localhost`, etc.).  
+   For SQL Authentication use `User ID=...;Password=...` instead of `Integrated Security=True`.
+4. **Build** the solution (NuGet packages restore automatically)
+5. **Set `SalesLedger` as the startup project** and press **F5** (or Ctrl+F5)
+6. The database `SalesLedgerDb` is **created automatically on first run** and seeded with sample data
 
-Use your own SQL Server instance name (examples):
-- `localhost`
-- `.\SQLEXPRESS`
-- `<YOUR-PC-NAME>`
-- `<YOUR-SERVER>\<INSTANCE>`
+> **No manual migration, no SQL scripts needed.** Entity Framework's `CreateDatabaseIfNotExists` initializer handles everything.
 
-### SQL Authentication example
+### Sample Data (Auto-Seeded)
 
-`Data Source=<YOUR_SERVER_OR_INSTANCE>;Initial Catalog=SalesLedgerDb;User ID=<SQL_USER>;Password=<SQL_PASSWORD>;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True`
+| Entity | Data |
+|--------|------|
+| Customers | Tarek Ibrahim, Test Customer |
+| Items | Item A ($100, 50 qty), Item B ($250, 20 qty), Item C ($75, 100 qty) |
+| Sales Orders | 2 open orders with lines — ready to test the full workflow |
 
-### Windows Authentication example
+### Test the Full Workflow
 
-`Data Source=<YOUR_SERVER_OR_INSTANCE>;Initial Catalog=SalesLedgerDb;Integrated Security=True;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True`
+1. Go to **Sales Orders** → click **Release** on an order → creates an invoice
+2. Go to **Invoices** → click **Post** → subtracts inventory, creates GL entry
+3. Click **Register Payment** on the posted invoice → enter amount → creates payment + GL entry
+4. Check **Inventory** to see updated stock levels
+5. Check **Journal Entries** to see all GL transactions with balanced debit/credit lines
 
-## Create database and seed data
+---
 
-This project uses Entity Framework 6 code-first migrations configuration in `SalesLedger.DataAccess`.
+## Tech Stack
 
-### Option A (recommended)
+| Layer | Technology |
+|-------|------------|
+| **Framework** | .NET Framework 4.8 |
+| **Presentation** | ASP.NET Web Forms, Bootstrap 5, Google Fonts (Inter) |
+| **Business Logic** | C# service classes with LINQ |
+| **Data Access** | Entity Framework 6 (Code First), Repository + Unit of Work pattern |
+| **Database** | Microsoft SQL Server |
+| **Language** | C# 7.3 |
 
-Run EF database update. EF will create/update schema and run seed.
+---
 
-### Option B (EF6 command line)
+## Project Architecture
 
-From PowerShell, run EF6 tool:
-- `SalesLedger/packages/EntityFramework.6.4.4/tools/net45/any/ef6.exe`
+```
+SalesLedgerProject/
+│
+├── SalesLedger/                        # Presentation layer (Web Forms)
+│   ├── Site.Master                     # Master page — navigation, global CSS theme
+│   ├── Default.aspx                    # Dashboard with KPI cards and quick actions
+│   ├── SalesOrders/
+│   │   ├── List.aspx                   # List SOs, Release → Invoice action
+│   │   └── Create.aspx                 # Create new SO with dynamic line items
+│   ├── Invoices/
+│   │   ├── List.aspx                   # List invoices, Post / Register Payment
+│   │   └── Create.aspx                 # Preview and create invoice from SO
+│   ├── Payments/
+│   │   ├── List.aspx                   # List all payments
+│   │   └── Create.aspx                 # Register payment with invoice selection
+│   ├── Inventory/
+│   │   └── List.aspx                   # View current item stock levels
+│   ├── Transactions/
+│   │   └── List.aspx                   # Journal entries list + drill-down to lines
+│   └── Web.config                      # Connection string, EF configuration
+│
+├── SalesLedger.Business/               # Business logic layer
+│   ├── Services/
+│   │   ├── SalesOrderService.cs        # SO creation, listing, customer/item lookups
+│   │   ├── InvoiceService.cs           # Invoice creation, posting, GL generation
+│   │   └── PaymentService.cs           # Payment + GL posting, inventory/GL queries
+│   └── Models/
+│       ├── SalesOrderDtos.cs           # View models for SO operations
+│       ├── InvoiceDtos.cs              # View models for invoice operations
+│       └── PaymentDtos.cs              # View models for payment, inventory, GL
+│
+├── SalesLedger.DataAccess/             # Data access layer
+│   ├── Entities/                       # EF Code First entity classes
+│   │   ├── Customer.cs                 # Customer(Id, Name)
+│   │   ├── Item.cs                     # Item(Id, Name, UnitPrice, OnHandQuantity)
+│   │   ├── SalesOrder.cs               # SalesOrder(Id, CustomerId, Date, Status)
+│   │   ├── SalesOrderLine.cs           # SalesOrderLine(SalesOrderId, ItemId, Qty, UnitPrice)
+│   │   ├── Invoice.cs                  # Invoice(Id, SalesOrderId, CustomerId, Date, Totals, Status)
+│   │   ├── InvoiceLine.cs              # InvoiceLine(Id, InvoiceId, ItemId, Qty, UnitPrice, ...)
+│   │   ├── Payment.cs                  # Payment(Id, CustomerId, InvoiceId, Date, Amount)
+│   │   ├── GLTransaction.cs            # GLTransaction(Id, Date)
+│   │   └── GLTransactionLine.cs        # GLTransactionLine(Id, GLTransactionId, Account, Debit, Credit)
+│   ├── Interfaces/                     # Repository abstractions
+│   ├── Repositories/                   # Repository + UnitOfWork implementations
+│   ├── SalesLedgerDbContext.cs         # DbContext with Fluent API configuration
+│   └── SalesLedgerDbInitializer.cs     # Auto-creates DB and seeds sample data
+│
+├── SQL/                                # SQL artifacts
+│   ├── sp_PostInvoice.sql              # Stored procedure for invoice posting
+│   ├── indexes.sql                     # Index definitions with justification
+│   └── open_invoices_by_customer.sql   # JOIN query for open invoices
+│
+└── SalesLedger.sln
+```
 
-Command pattern:
+### Design Decisions
 
-`ef6 database update --assembly <path to SalesLedger.DataAccess.dll> --project-dir <path to SalesLedger.DataAccess> --config <path to SalesLedger.DataAccess/App.config> --connection-string-name SalesLedgerDb --migrations-config SalesLedger.DataAccess.Migrations.Configuration`
+| Decision | Rationale |
+|----------|-----------|
+| **Three-layer architecture** | Clear separation — Presentation → Business → Data Access. The web project never touches `DbContext` directly. |
+| **Repository + Unit of Work** | Abstracts EF behind interfaces. A single `UnitOfWork` wraps all operations in one transaction (e.g., posting an invoice updates stock, creates GL entries, and changes status atomically). |
+| **Service layer** | Business rules (validation, calculations, status transitions, GL posting) live in service classes, keeping code-behind thin. |
+| **Code First + Fluent API** | Relationships, precision, and constraints are configured centrally in `OnModelCreating`, keeping entity classes clean. |
+| **DTOs** | The business layer returns DTOs (not EF entities) to the presentation layer, preventing lazy-loading issues and keeping the contract explicit. |
+| **CreateDatabaseIfNotExists** | Simplest initializer — creates the DB and seeds on first run. No migration commands needed for reviewers. |
 
-## Seeded sample data
+---
 
-Seed inserts sample records for:
-- Customers
-- Items
-- Sales Orders + Sales Order Lines
-- Invoices + Invoice Lines
-- Payments
-- GL Transactions + GL Transaction Lines
+## Entities
 
-## Run the application
+| Entity | Fields |
+|--------|--------|
+| **Customer** | Id, Name |
+| **Item** | Id, Name, UnitPrice, OnHandQuantity |
+| **SalesOrder** | Id, CustomerId, Date, Status |
+| **SalesOrderLine** | SalesOrderId, ItemId (composite PK), Qty, UnitPrice |
+| **Invoice** | Id, SalesOrderId, CustomerId, Date, NetTotal, TaxTotal, GrossTotal, AmountPaid, Status |
+| **InvoiceLine** | Id, InvoiceId, ItemId, Qty, UnitPrice, LineTotal, TaxAmount |
+| **Payment** | Id, CustomerId, InvoiceId, Date, Amount |
+| **GLTransaction** | Id, Date |
+| **GLTransactionLine** | Id, GLTransactionId, Account, Debit, Credit |
 
-1. Set `SalesLedger` as startup project.
-2. Build solution.
-3. Run (`F5` / IIS Express).
+---
 
-## Connect with SSMS
+## Modules & Workflow
 
-Use the same SQL Server instance and credentials from your connection string.
+### 1. Sales Orders
 
-After connecting, refresh `Databases` and confirm `SalesLedgerDb` exists.
+- Create a sales order (status: **Open**) with one or more lines
+- No accounting impact at this stage
 
-## Git ignore and tracked artifacts
+### 2. Release SO → Invoice
 
-Repository includes `.gitignore` to exclude:
-- `.vs/`
-- `bin/`, `obj/`, `Debug/`, `Release/`
-- user/temp/log/test artifacts
+- Release an open SO to generate an invoice
+- Invoice lines copied from SO lines; totals calculated:
+  - `NetTotal = Σ(Qty × UnitPrice)`
+  - `TaxTotal = NetTotal × 0.11` (fixed 11% VAT)
+  - `GrossTotal = NetTotal + TaxTotal`
+- SO status → **Released**, Invoice status → **Open**
 
-If build artifacts were previously tracked, untrack once with:
+### 3. Post Invoice
 
-`git rm -r --cached <artifact paths>`
+- Subtracts `OnHandQuantity` for each item on the invoice
+- Creates a balanced GL transaction:
 
-then commit.
+  | Account | Debit | Credit |
+  |---------|-------|--------|
+  | 1100 AR | GrossTotal | — |
+  | 4000 Sales | — | NetTotal |
+  | 2100 VAT Payable | — | TaxTotal |
 
-## Common issues
+- Invoice status → **Posted**
 
-### `No connection string named 'SalesLedgerDb' could be found`
+### 4. Receive Payment
 
-Ensure `SalesLedgerDb` exists in:
-- `SalesLedger.DataAccess/App.config`
-- `SalesLedger/Web.config`
+- Select a posted or partially paid invoice
+- Enter payment amount (validated ≤ balance due)
+- Creates a GL transaction:
 
-### SQL login failed
+  | Account | Debit | Credit |
+  |---------|-------|--------|
+  | 1000 Cash | Amount | — |
+  | 1100 AR | — | Amount |
 
-- Confirm SQL Server is running.
-- Confirm SQL Authentication mode is enabled (if using SQL login).
-- Confirm login/password are correct.
-- Confirm server/instance name in connection string.
+- Invoice status → **Paid** (fully paid) or **PartiallyPaid**
 
-### Database not visible in SSMS
+### Status Flow
 
-- Connect to the same instance used in `Data Source`.
-- Refresh `Databases`.
+```
+Sales Order:  Open ──→ Released
+Invoice:      Open ──→ Posted ──→ PartiallyPaid ──→ Paid
+```
+
+### Supporting Views
+
+| View | Purpose |
+|------|---------|
+| **Inventory** | Real-time stock levels per item (updated after invoice posting) |
+| **Journal Entries** | All GL entries with balanced/unbalanced indicator and drill-down to lines |
+
+---
+
+## Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| **Connection string error** | Update `Data Source` in `Web.config` to match your SQL Server instance |
+| **Login failed** | Check SQL Server is running, credentials are correct, and SQL/Windows auth mode matches |
+| **Database not created** | Ensure the SQL user has `CREATE DATABASE` permission |
+| **Model changed error** | Delete the `SalesLedgerDb` database and restart — it will be recreated |
