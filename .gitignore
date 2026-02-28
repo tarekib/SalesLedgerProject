@@ -1,0 +1,33 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+**/[Bb]in/
+**/[Oo]bj/
+**/Debug/
+**/Release/
+
+# NuGet package restore artifacts
+packages/
+*.nupkg
+
+# Logs
+*.log
+
+# Test / coverage
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db

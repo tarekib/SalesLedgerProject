@@ -51,12 +51,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Entities\Customer.cs" />
+    <Compile Include="Entities\GLTransaction.cs" />
+    <Compile Include="Entities\GLTransactionLine.cs" />
+    <Compile Include="Entities\Invoice.cs" />
+    <Compile Include="Entities\InvoiceLine.cs" />
+    <Compile Include="Entities\Item.cs" />
+    <Compile Include="Entities\Payment.cs" />
+    <Compile Include="Entities\SalesOrderLine.cs" />
+    <Compile Include="Entities\SalesOrder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SalesLedgerDbContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Migrations\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
