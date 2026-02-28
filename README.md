@@ -112,10 +112,6 @@ SalesLedgerProject/
 │   ├── SalesLedgerDbContext.cs         # DbContext with Fluent API configuration
 │   └── SalesLedgerDbInitializer.cs     # Auto-creates DB and seeds sample data
 │
-├── SQL/                                # SQL artifacts
-│   ├── sp_PostInvoice.sql              # Stored procedure for invoice posting
-│   ├── indexes.sql                     # Index definitions with justification
-│   └── open_invoices_by_customer.sql   # JOIN query for open invoices
 │
 └── SalesLedger.sln
 ```
