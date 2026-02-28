@@ -13,13 +13,21 @@ namespace SalesLedger.DataAccess
         }
 
         public DbSet<Customer> Customers { get; set; }
+     
         public DbSet<Item> Items { get; set; }
+        
         public DbSet<SalesOrder> SalesOrders { get; set; }
+        
         public DbSet<SalesOrderLine> SalesOrderLines { get; set; }
+        
         public DbSet<Invoice> Invoices { get; set; }
+        
         public DbSet<InvoiceLine> InvoiceLines { get; set; }
+        
         public DbSet<Payment> Payments { get; set; }
+        
         public DbSet<GLTransaction> GLTransactions { get; set; }
+        
         public DbSet<GLTransactionLine> GLTransactionLines { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
