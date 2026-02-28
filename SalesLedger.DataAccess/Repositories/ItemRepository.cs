@@ -8,7 +8,6 @@ namespace SalesLedger.DataAccess.Repositories
     {
         public ItemRepository(SalesLedgerDbContext context) : base(context) { }
 
-        public IEnumerable<Item> GetAllOrdered()
-            => Context.Items.OrderBy(i => i.Name).ToList();
+        public IEnumerable<Item> GetAllOrdered() => Context.Items.OrderBy(i => i.Name).ToList();
     }
 }

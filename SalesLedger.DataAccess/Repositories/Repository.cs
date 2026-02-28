@@ -21,8 +21,7 @@ namespace SalesLedger.DataAccess.Repositories
 
         public IEnumerable<T> GetAll() => DbSet.ToList();
 
-        public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
-            => DbSet.Where(predicate).ToList();
+        public IEnumerable<T> Find(Expression<Func<T, bool>> predicate) => DbSet.Where(predicate).ToList();
 
         public void Add(T entity) => DbSet.Add(entity);
 

@@ -20,6 +20,8 @@ namespace SalesLedger.DataAccess.Entities
         
         public decimal GrossTotal { get; set; }
 
+        public decimal AmountPaid { get; set; }
+
         [Required]
         [MaxLength(50)]
         public string Status { get; set; }
@@ -29,5 +31,7 @@ namespace SalesLedger.DataAccess.Entities
         public virtual Customer Customer { get; set; }
         
         public virtual ICollection<InvoiceLine> Lines { get; set; } = new HashSet<InvoiceLine>();
+
+        public virtual ICollection<Payment> Payments { get; set; } = new HashSet<Payment>();
     }
 }

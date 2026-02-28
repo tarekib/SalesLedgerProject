@@ -1,33 +1,35 @@
 ﻿using SalesLedger.DataAccess.Entities;
-using System;
 using System.Data.Entity;
-using System.Data.Entity.Migrations;
-using System.Linq;
 
 namespace SalesLedger.DataAccess
 {
     public class SalesLedgerDbContext : DbContext
     {
+        static SalesLedgerDbContext()
+        {
+            Database.SetInitializer(new SalesLedgerDbInitializer());
+        }
+
         public SalesLedgerDbContext() : base("name=SalesLedgerDb")
         {
         }
 
         public DbSet<Customer> Customers { get; set; }
-     
+
         public DbSet<Item> Items { get; set; }
-        
+
         public DbSet<SalesOrder> SalesOrders { get; set; }
-        
+
         public DbSet<SalesOrderLine> SalesOrderLines { get; set; }
-        
+
         public DbSet<Invoice> Invoices { get; set; }
-        
+
         public DbSet<InvoiceLine> InvoiceLines { get; set; }
-        
+
         public DbSet<Payment> Payments { get; set; }
-        
+
         public DbSet<GLTransaction> GLTransactions { get; set; }
-        
+
         public DbSet<GLTransactionLine> GLTransactionLines { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -78,6 +80,10 @@ namespace SalesLedger.DataAccess
 
             modelBuilder.Entity<Invoice>()
                 .Property(x => x.GrossTotal)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Invoice>()
+                .Property(x => x.AmountPaid)
                 .HasPrecision(18, 2);
 
             modelBuilder.Entity<Invoice>()
@@ -166,149 +172,17 @@ namespace SalesLedger.DataAccess
                 .HasForeignKey(x => x.CustomerId)
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<Payment>()
+                .HasRequired(x => x.Invoice)
+                .WithMany(x => x.Payments)
+                .HasForeignKey(x => x.InvoiceId)
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<GLTransactionLine>()
                 .HasRequired(x => x.GLTransaction)
                 .WithMany(x => x.Lines)
                 .HasForeignKey(x => x.GLTransactionId)
                 .WillCascadeOnDelete(true);
-        }
-    }
-}
-
-namespace SalesLedger.DataAccess.Migrations
-{
-    internal sealed class Configuration : DbMigrationsConfiguration<SalesLedger.DataAccess.SalesLedgerDbContext>
-    {
-        public Configuration()
-        {
-            AutomaticMigrationsEnabled = true;
-            AutomaticMigrationDataLossAllowed = false;
-        }
-
-        protected override void Seed(SalesLedgerDbContext context)
-        {
-            context.Customers.AddOrUpdate(
-                x => x.Name,
-                new Customer { Name = "Acme Ltd" },
-                new Customer { Name = "Blue Ocean LLC" });
-
-            context.Items.AddOrUpdate(
-                x => x.Name,
-                new Item { Name = "Item A", UnitPrice = 100m, OnHandQuantity = 50m },
-                new Item { Name = "Item B", UnitPrice = 250m, OnHandQuantity = 20m });
-
-            context.SaveChanges();
-
-            var customer = context.Customers.First(x => x.Name == "Acme Ltd");
-            var item = context.Items.First(x => x.Name == "Item A");
-
-            var order = context.SalesOrders.FirstOrDefault(x => x.CustomerId == customer.Id && x.Status == "Open");
-            if (order == null)
-            {
-                order = context.SalesOrders.Add(new SalesOrder
-                {
-                    CustomerId = customer.Id,
-                    Date = DateTime.Today,
-                    Status = "Open"
-                });
-                context.SaveChanges();
-            }
-
-            context.SalesOrderLines.AddOrUpdate(
-                x => new { x.SalesOrderId, x.ItemId },
-                new SalesOrderLine
-                {
-                    SalesOrderId = order.Id,
-                    ItemId = item.Id,
-                    Qty = 2m,
-                    UnitPrice = item.UnitPrice
-                });
-
-            context.SaveChanges();
-
-            var invoice = context.Invoices.FirstOrDefault(x => x.SalesOrderId == order.Id);
-            if (invoice == null)
-            {
-                invoice = context.Invoices.Add(new Invoice
-                {
-                    SalesOrderId = order.Id,
-                    CustomerId = customer.Id,
-                    Date = DateTime.Today,
-                    NetTotal = 200m,
-                    TaxTotal = 30m,
-                    GrossTotal = 230m,
-                    Status = "Posted"
-                });
-                context.SaveChanges();
-            }
-
-            if (!context.InvoiceLines.Any(x => x.InvoiceId == invoice.Id && x.ItemId == item.Id))
-            {
-                context.InvoiceLines.Add(new InvoiceLine
-                {
-                    InvoiceId = invoice.Id,
-                    ItemId = item.Id,
-                    Qty = 2m,
-                    UnitPrice = 100m,
-                    LineTotal = 200m,
-                    TaxAmount = 30m
-                });
-            }
-
-            if (!context.Payments.Any(x => x.CustomerId == customer.Id && x.Amount == 230m))
-            {
-                context.Payments.Add(new Payment
-                {
-                    CustomerId = customer.Id,
-                    Date = DateTime.Today,
-                    Amount = 230m
-                });
-            }
-
-            var gl = context.GLTransactions.FirstOrDefault(x => x.Date == DateTime.Today);
-            if (gl == null)
-            {
-                gl = context.GLTransactions.Add(new GLTransaction
-                {
-                    Date = DateTime.Today
-                });
-                context.SaveChanges();
-            }
-
-            if (!context.GLTransactionLines.Any(x => x.GLTransactionId == gl.Id && x.Account == "AccountsReceivable"))
-            {
-                context.GLTransactionLines.Add(new GLTransactionLine
-                {
-                    GLTransactionId = gl.Id,
-                    Account = "AccountsReceivable",
-                    Debit = 230m,
-                    Credit = 0m
-                });
-            }
-
-            if (!context.GLTransactionLines.Any(x => x.GLTransactionId == gl.Id && x.Account == "SalesRevenue"))
-            {
-                context.GLTransactionLines.Add(new GLTransactionLine
-                {
-                    GLTransactionId = gl.Id,
-                    Account = "SalesRevenue",
-                    Debit = 0m,
-                    Credit = 200m
-                });
-            }
-
-            if (!context.GLTransactionLines.Any(x => x.GLTransactionId == gl.Id && x.Account == "TaxPayable"))
-            {
-                context.GLTransactionLines.Add(new GLTransactionLine
-                {
-                    GLTransactionId = gl.Id,
-                    Account = "TaxPayable",
-                    Debit = 0m,
-                    Credit = 30m
-                });
-            }
-
-            context.SaveChanges();
         }
     }
 }

@@ -5,16 +5,18 @@ using System.Linq;
 
 namespace SalesLedger.DataAccess.Repositories
 {
-    public class SalesOrderRepository : Repository<SalesOrder>, ISalesOrderRepository
+    public class InvoiceRepository : Repository<Invoice>, IInvoiceRepository
     {
-        public SalesOrderRepository(SalesLedgerDbContext context) : base(context) { }
+        public InvoiceRepository(SalesLedgerDbContext context) : base(context) { }
 
-        public IEnumerable<SalesOrder> GetAllWithDetails()
-            => Context.SalesOrders
+        public IEnumerable<Invoice> GetAllWithDetails()
+            => Context.Invoices
                 .Include(x => x.Customer)
+                .Include(x => x.SalesOrder)
                 .Include(x => x.Lines)
                 .Include(x => x.Lines.Select(l => l.Item))
                 .OrderByDescending(x => x.Date)
+                .ThenByDescending(x => x.Id)
                 .ToList();
     }
 }
