@@ -12,6 +12,159 @@
     </asp:PlaceHolder>
     <webopt:bundlereference runat="server" path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --sl-primary: #714B67;
+            --sl-primary-dark: #5B3A54;
+            --sl-primary-light: #f3edf2;
+            --sl-accent: #00A09D;
+            --sl-text: #212529;
+            --sl-text-muted: #6c757d;
+            --sl-border: #dee2e6;
+            --sl-bg: #f8f9fa;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--sl-bg);
+            color: var(--sl-text);
+            font-size: 0.875rem;
+        }
+        /* Navbar */
+        .sl-navbar {
+            background-color: var(--sl-primary) !important;
+            border-bottom: none;
+            padding: 0 1rem;
+            min-height: 46px;
+        }
+        .sl-navbar .navbar-brand {
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.02em;
+            color: #fff !important;
+            padding: 0.6rem 0;
+        }
+        .sl-navbar .nav-link {
+            color: rgba(255,255,255,.8) !important;
+            font-weight: 500;
+            font-size: 0.8125rem;
+            padding: 0.75rem 0.875rem !important;
+            border-bottom: 2px solid transparent;
+            transition: all .15s;
+        }
+        .sl-navbar .nav-link:hover,
+        .sl-navbar .nav-link.active {
+            color: #fff !important;
+            background: rgba(255,255,255,.1);
+        }
+        /* Page header */
+        .sl-page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 0 1rem;
+            border-bottom: 1px solid var(--sl-border);
+            margin-bottom: 1.25rem;
+        }
+        .sl-page-header h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--sl-text);
+        }
+        /* Cards */
+        .card {
+            border: 1px solid var(--sl-border);
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,.04);
+        }
+        .card-header {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        /* Tables */
+        .table {
+            font-size: 0.8125rem;
+            margin-bottom: 0;
+        }
+        .table > thead > tr > th {
+            background-color: var(--sl-primary-light) !important;
+            color: var(--sl-text) !important;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-bottom: 2px solid var(--sl-border) !important;
+            padding: 0.6rem 0.75rem;
+        }
+        .table > tbody > tr > td {
+            padding: 0.55rem 0.75rem;
+            vertical-align: middle;
+        }
+        .table-hover > tbody > tr:hover {
+            background-color: var(--sl-primary-light) !important;
+        }
+        .table-striped > tbody > tr:nth-of-type(odd) > td {
+            background-color: transparent;
+        }
+        .table-striped > tbody > tr:nth-of-type(even) > td {
+            background-color: #fafafa;
+        }
+        /* Badges */
+        .badge {
+            font-weight: 500;
+            font-size: 0.7rem;
+            padding: 0.3em 0.65em;
+            border-radius: 3px;
+            letter-spacing: 0.02em;
+        }
+        .badge-open { background-color: #28a745; color: #fff; }
+        .badge-released { background-color: #6c757d; color: #fff; }
+        .badge-posted { background-color: #0dcaf0; color: #212529; }
+        .badge-partiallypaid { background-color: #fd7e14; color: #fff; }
+        .badge-paid { background-color: #198754; color: #fff; }
+        /* Buttons */
+        .btn {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            border-radius: 3px;
+        }
+        .btn-primary {
+            background-color: var(--sl-primary);
+            border-color: var(--sl-primary);
+        }
+        .btn-primary:hover {
+            background-color: var(--sl-primary-dark);
+            border-color: var(--sl-primary-dark);
+        }
+        .btn-sm {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+        }
+        /* Alerts */
+        .alert { font-size: 0.8125rem; border-radius: 3px; }
+        /* Form controls */
+        .form-control, .form-select {
+            font-size: 0.8125rem;
+            border-radius: 3px;
+        }
+        .form-label {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        /* Footer */
+        .sl-footer {
+            border-top: 1px solid var(--sl-border);
+            padding: 0.75rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--sl-text-muted);
+        }
+    </style>
 </head>
 <body>
     <form runat="server">
@@ -31,8 +184,8 @@
             </Scripts>
         </asp:ScriptManager>
 
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-            <div class="container">
+        <nav class="navbar navbar-expand-sm navbar-dark sl-navbar">
+            <div class="container-fluid">
                 <a class="navbar-brand" href="/Default.aspx">SalesLedger</a>
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse"
                     data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -40,22 +193,23 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">Sales</a>
-                            <ul class="dropdown-menu dropdown-menu-dark">
-                                <li><a class="dropdown-item" href="/SalesOrders/List.aspx">Sales Orders</a></li>
-                                <li><a class="dropdown-item" href="/SalesOrders/Create.aspx">New Sales Order</a></li>
-                            </ul>
-                        </li>
+                    <ul class="navbar-nav">
+                        <li class="nav-item"><a class="nav-link" href="/SalesOrders/List.aspx">Sales Orders</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Invoices/List.aspx">Invoices</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Payments/List.aspx">Payments</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Inventory/List.aspx">Inventory</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Transactions/List.aspx">GL Transactions</a></li>
                     </ul>
                 </div>
             </div>
         </nav>
 
-        <div class="container mt-4">
+        <div class="container-fluid px-4">
             <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+        </div>
+
+        <div class="sl-footer">
+            SalesLedger &copy; <%: DateTime.Now.Year %> &mdash; Sales Module
         </div>
     </form>
     <asp:PlaceHolder runat="server">

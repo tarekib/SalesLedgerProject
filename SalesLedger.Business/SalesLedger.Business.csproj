@@ -41,9 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Models\InvoiceDtos.cs" />
+    <Compile Include="Models\PaymentDtos.cs" />
     <Compile Include="Models\SalesOrderDtos.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\InvoiceService.cs" />
+    <Compile Include="Services\PaymentService.cs" />
     <Compile Include="Services\SalesOrderService.cs" />
   </ItemGroup>
   <ItemGroup>

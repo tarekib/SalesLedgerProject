@@ -13,5 +13,9 @@ namespace SalesLedger
 
     public partial class _Default
     {
+        protected global::System.Web.UI.WebControls.Literal litOpenOrders;
+        protected global::System.Web.UI.WebControls.Literal litUnpaidInvoices;
+        protected global::System.Web.UI.WebControls.Literal litPayments;
+        protected global::System.Web.UI.WebControls.Literal litGLTx;
     }
 }

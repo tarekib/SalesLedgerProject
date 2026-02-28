@@ -20,17 +20,20 @@ namespace SalesLedger.Business.Services
 
         public int CreateSalesOrder(CreateSalesOrderRequest request)
         {
-            if (request == null)
+            if (request is null)
                 throw new ArgumentNullException("request");
+            
             if (request.CustomerId <= 0)
                 throw new ArgumentException("A customer must be selected.");
-            if (request.Lines == null || request.Lines.Count == 0)
+            
+            if (request.Lines is null || request.Lines.Count == 0)
                 throw new ArgumentException("At least one order line is required.");
 
             foreach (var line in request.Lines)
             {
                 if (line.Qty <= 0)
                     throw new ArgumentException("Quantity must be greater than zero on all lines.");
+              
                 if (line.ItemId <= 0)
                     throw new ArgumentException("Each line must have an item selected.");
             }
@@ -56,6 +59,7 @@ namespace SalesLedger.Business.Services
 
                 uow.SalesOrders.Add(order);
                 uow.Complete();
+               
                 return order.Id;
             }
         }

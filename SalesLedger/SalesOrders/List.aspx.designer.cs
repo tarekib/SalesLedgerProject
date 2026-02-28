@@ -10,6 +10,8 @@ namespace SalesLedger.SalesOrders
     {
         protected global::System.Web.UI.WebControls.Panel pnlSuccess;
         protected global::System.Web.UI.WebControls.Literal litMessage;
+        protected global::System.Web.UI.WebControls.Panel pnlError;
+        protected global::System.Web.UI.WebControls.Literal litError;
         protected global::System.Web.UI.WebControls.GridView gvOrders;
     }
 }
